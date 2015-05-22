@@ -117,23 +117,23 @@ $(function(){
                 //set json data
                 if(newRow && yInt == 0 && newRow){ // if first row
 
-                    jImg = '{ '+ $('#imageLoader').val() +' : [{' + xInt +':'+ rgbToHex(r,g,b) + '';
+                    jImg = '{"0": {"' + xInt +'":"'+ rgbToHex(r,g,b) + '"';
                     newRow = false;
 
                 }else if(newRow && yInt > 0){ // if new row and not first
 
-                    jImg += '}, ' + yInt + ': {' + xInt +':'+ rgbToHex(r,g,b) + '';
+                    jImg += '}, "' + yInt + '": {"' + xInt +'":"'+ rgbToHex(r,g,b) + '"';
                     newRow = false;
 
                 }else{
-                    jImg += ',' + xInt +':'+ rgbToHex(r,g,b) + '';
+                    jImg += ',"' + xInt +'":"'+ rgbToHex(r,g,b) + '"';
                 }
                 xInt++;
             }
             yInt++;
             newRow = true;
         }
-        jImg += '}]}'; // end of json encoding
+        jImg += '}}'; // end of json encoding
 
         var saveData = canvasEx.toDataURL(); // save png data
         $('.savePng').attr('href',saveData).show(); // set to href and show link
@@ -142,9 +142,16 @@ $(function(){
     }
 
     function createJSON(){
+        var jsonOut = JSON.stringify(jImg);
+        var jsonObj = JSON.parse(jsonOut);
 
-        console.log(jImg);
-        jData = "text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(jImg))
-        $('.saveJson').attr('href','data:'+jData).show();
+        var blob = new Blob([jsonObj], {type: "application/json"});
+        var url  = URL.createObjectURL(blob);
+
+        var a = document.getElementById("saveJson");
+        a.download = $('#imageLoader').val() +".json";
+        a.href = url;
+        a.textContent = "Download " + $('#imageLoader').val() + ".json";
+        $('#saveJson').show();
     }
 });
